@@ -22,6 +22,28 @@ const StorageCtrl = (() => {
         items = JSON.parse(localStorage.getItem('items'));
       }
       return items;
+    },
+    updateItemStorage: (updatedItem) => {
+      // grab datafrom LS, after changing to arr of objs loop through it, splice will find target item through index, remove and replace with updated item. 
+      let items = JSON.parse(localStorage.getItem('items'));
+      items.forEach((item, index) => {
+        if(updatedItem.id === item.id) {
+          items.splice(index, 1, updatedItem);
+        }
+      });
+      localStorage.setItem('items', JSON.stringify(items));
+    },
+    deleteItemFromStorage: (id) => {
+      let items = JSON.parse(localStorage.getItem('items'));
+      items.forEach((item, index) => {
+        if(id === item.id) {
+          items.splice(index, 1);
+        }
+      });
+      localStorage.setItem('items', JSON.stringify(items));
+    },
+    clearItemsFromStorage: () => {
+      localStorage.removeItem('items');
     }
   }
 })();
@@ -319,6 +341,8 @@ const AppCtrl = ((ItemCtrl, StorageCtrl, UiCtrl) => {
 
     // Show total calories in UI
     UiCtrl.showTotalCalories(totalCalories);
+    // Update LS, updatedItem comes from the top of function.
+    StorageCtrl.updateItemStorage(updatedItem);
 
     UiCtrl.clearEditState();
 
@@ -337,6 +361,9 @@ const AppCtrl = ((ItemCtrl, StorageCtrl, UiCtrl) => {
    // Show total calories in UI
    UiCtrl.showTotalCalories(totalCalories);
 
+  //  delete from LS
+  StorageCtrl.deleteItemFromStorage(currentItem.id);
+
    UiCtrl.clearEditState();
 
     e.preventDefault();
@@ -349,6 +376,7 @@ const AppCtrl = ((ItemCtrl, StorageCtrl, UiCtrl) => {
     const totalCalories = ItemCtrl.getTotalCalories();
     UiCtrl.showTotalCalories(totalCalories);
     UiCtrl.removeItems();
+    StorageCtrl.clearItemsFromStorage();
 
     // hide ul
     UiCtrl.hideList();
